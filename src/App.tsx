@@ -1,37 +1,42 @@
+import React from 'react';
 import './App.css';
+import { AuthProvider } from './contexts/AuthContext';
+import { Card, Button, Heading, Text } from './components/atoms';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold text-primary-600 mb-4">
-            TaskSphere
-          </h1>
-          <p className="text-xl text-secondary-600 mb-8">
-            Gestão colaborativa de projetos em desenvolvimento...
-          </p>
-          
-          <div className="card max-w-md mx-auto">
-            <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
-              🚀 Projeto em Construção
-            </h2>
-            <p className="text-secondary-600 mb-6">
-              Sistema moderno de gestão de projetos e tarefas colaborativas.
-            </p>
+    <AuthProvider>
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center">
+            <Heading level={1} className="text-primary-600 mb-4">
+              TaskSphere
+            </Heading>
+            <Text variant="caption" color="muted" className="mb-8">
+              Gestão colaborativa de projetos em desenvolvimento...
+            </Text>
             
-            <div className="space-y-3">
-              <button className="btn-primary w-full">
-                Entrar no Sistema
-              </button>
-              <button className="btn-secondary w-full">
-                Saber Mais
-              </button>
-            </div>
+            <Card className="max-w-md mx-auto">
+              <Heading level={2} className="mb-4">
+                🚀 Projeto em Construção
+              </Heading>
+              <Text color="muted" className="mb-6">
+                AuthContext configurado! Próximo: React Router e Login
+              </Text>
+              
+              <div className="space-y-3">
+                <Button fullWidth>
+                  Entrar no Sistema
+                </Button>
+                <Button variant="secondary" fullWidth>
+                  Saber Mais
+                </Button>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
-    </div>
+    </AuthProvider>
   );
 }
 
