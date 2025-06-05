@@ -1631,7 +1631,7 @@ async login(credentials: { email: string; password: string }): Promise<User> {
     return tasks.filter(task => 
       task.project_id && 
       userProjectIds.includes(task.project_id) &&
-      (task.creator_id === userId || task.assignee?.id === userId)
+      task.creator_id === userId
     )
   },
 
