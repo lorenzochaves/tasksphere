@@ -1,101 +1,97 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./public/index.html",
-  ],
+  darkMode: ["class"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
+        // Cores base do GitHub Dark
+        background: "#0d1117", 
+        foreground: "#c9d1d9",
+        muted: "#8b949e",
+        border: "#30363d",
+        
+        // Cores de UI
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          DEFAULT: "#238636", // Verde do GitHub
+          hover: "#2ea043",
+          foreground: "#ffffff",
         },
         secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          DEFAULT: "#1f6feb", // Azul do GitHub
+          hover: "#388bfd",
+          foreground: "#ffffff",
         },
-        success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
+        destructive: {
+          DEFAULT: "#da3633", // Vermelho do GitHub
+          hover: "#f85149",
+          foreground: "#ffffff", 
         },
-        warning: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
+        
+        // Cores específicas
+        card: "#161b22",
+        popover: "#161b22",
+        accent: "#388bfd20", // Azul com transparência
+        
+        // Status
+        success: "#238636",
+        warning: "#9e6a03",
+        error: "#f85149",
+        
+        // Tons neutros
+        neutral: {
+          50: "#f7f7f7",
+          100: "#e6e6e6",
+          200: "#cccccc",
+          300: "#b3b3b3",
+          400: "#999999",
+          500: "#808080",
+          600: "#666666",
+          700: "#4d4d4d",
+          800: "#333333",
+          900: "#1a1a1a",
         },
-        danger: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-        }
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+        sans: [
+          "-apple-system", 
+          "BlinkMacSystemFont", 
+          "Segoe UI", 
+          "Noto Sans", 
+          "Helvetica", 
+          "Arial", 
+          "sans-serif", 
+          "Apple Color Emoji", 
+          "Segoe UI Emoji"
+        ],
+        mono: ["Consolas", "Monaco", "Andale Mono", "Ubuntu Mono", "monospace"],
+      },
+      borderRadius: {
+        lg: "0.625rem", // 10px
+        md: "0.375rem", // 6px
+        sm: "0.25rem",  // 4px
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        'large': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        dropdown: "0 8px 24px rgba(140,149,159,0.2)",
+        card: "0 0 0 1px rgba(53,59,69,0.2)",
+        medium: "0 3px 6px rgba(0,0,0,0.15)",
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
+        "fade-in": "fadeIn 0.5s ease-out",
+        "slide-in": "slideIn 0.3s ease-out",
+        "spin": "spin 1s linear infinite",
+        "pulse": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          "0%": { opacity: "0", transform: "translateY(-10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideDown: {
-          '0%': { transform: 'translateY(-10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        slideIn: {
+          "0%": { opacity: "0", transform: "translateY(-20px) scale(0.95)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
         },
       },
     },
   },
-  plugins: [],
+  plugins: [], // Removendo plugins que causam erro
 }
