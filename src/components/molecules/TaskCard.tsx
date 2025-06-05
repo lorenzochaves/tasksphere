@@ -95,14 +95,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, showProject = false 
             </Typography>
           </div>
 
-          {/* Criador da tarefa */}
-          <div className="flex items-center gap-2">
-            <User className="h-3 w-3 flex-shrink-0 text-[#8b949e]" />
-            <Typography variant="small" className="text-[#8b949e] truncate">
-              {task.creator_name || "Não atribuída"}
-            </Typography>
-          </div>
-
           {/* Nome do projeto (opcional) */}
           {showProject && task.project_name && (
             <div className="flex items-center gap-2">
