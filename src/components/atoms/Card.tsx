@@ -1,42 +1,77 @@
-import React from 'react';
+import type React from "react"
+import { forwardRef } from "react"
+import { cn } from "../../lib/utils"
+import Typography from "./Typography"
 
-export interface CardProps {
-  children: React.ReactNode;
-  variant?: 'default' | 'elevated' | 'outlined';
-  padding?: 'sm' | 'md' | 'lg';
-  className?: string;
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+  hover?: boolean
 }
 
-export const Card: React.FC<CardProps> = ({
-  children,
-  variant = 'default',
-  padding = 'md',
-  className = '',
-}) => {
-  const baseClasses = 'bg-white rounded-xl border border-secondary-100';
-  
-  const variantClasses = {
-    default: 'shadow-soft',
-    elevated: 'shadow-large',
-    outlined: 'border-2 border-secondary-200 shadow-none',
-  };
-  
-  const paddingClasses = {
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
-  };
-  
-  const classes = [
-    baseClasses,
-    variantClasses[variant],
-    paddingClasses[padding],
-    className,
-  ].filter(Boolean).join(' ');
-  
-  return (
-    <div className={classes}>
-      {children}
-    </div>
-  );
-};
+const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ children, className = "", onClick, hover = false, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "bg-[#0d1117] border border-[#30363d] rounded-lg shadow-sm overflow-hidden",
+          hover && "hover:border-[#484f58] transition-all duration-200 hover:shadow-md",
+          onClick && "cursor-pointer",
+          className,
+        )}
+        onClick={onClick}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  },
+)
+
+Card.displayName = "Card"
+
+interface CardHeaderProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = "" }) => (
+  <div className={cn("p-6 border-b border-[#30363d]", className)}>
+    {children}
+  </div>
+)
+
+interface CardContentProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export const CardContent: React.FC<CardContentProps> = ({ children, className = "" }) => (
+  <div className={cn("p-6", className)}>
+    {children}
+  </div>
+)
+
+interface CardTitleProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export const CardTitle: React.FC<CardTitleProps> = ({ children, className = "" }) => (
+  <Typography variant="h5" className={className}>
+    {children}
+  </Typography>
+)
+
+interface CardFooterProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export const CardFooter: React.FC<CardFooterProps> = ({ children, className = "" }) => (
+  <div className={cn("p-6 border-t border-[#30363d] bg-[#21262d]", className)}>
+    {children}
+  </div>
+)
+
+export default Card
