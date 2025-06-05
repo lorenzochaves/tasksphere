@@ -1,68 +1,71 @@
-import React from 'react';
+import React from "react"
+import { cn } from "../../lib/utils"
 
-export interface ButtonProps {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
-  fullWidth?: boolean;
-  disabled?: boolean;
-  loading?: boolean;
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-  className?: string;
+type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "destructive"
+type ButtonSize = "sm" | "md" | "lg" | "icon"
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant
+  size?: ButtonSize
+  asChild?: boolean
+  children: React.ReactNode
 }
 
-export const Button: React.FC<ButtonProps> = ({
+const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
+  primary: "bg-[#238636] text-white hover:bg-[#2ea043] focus:ring-[#238636]",
+  secondary: "bg-[#21262d] text-[#c9d1d9] border border-[#30363d] hover:bg-[#30363d] focus:ring-[#30363d]",
+  outline: "bg-transparent border border-[#30363d] text-[#c9d1d9] hover:bg-[#21262d] focus:ring-[#30363d]",
+  ghost: "bg-transparent text-[#c9d1d9] hover:bg-[#21262d] focus:ring-[#30363d]",
+  destructive: "bg-[#da3633] text-white hover:bg-[#e5534b] focus:ring-[#da3633]",
+} as const
+
+const BUTTON_SIZES: Record<ButtonSize, string> = {
+  sm: "px-3 py-1.5 text-sm",
+  md: "px-4 py-2 text-sm",
+  lg: "px-6 py-3 text-base",
+  icon: "p-2",
+} as const
+
+const BASE_STYLES = "inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0d1117] disabled:opacity-50 disabled:cursor-not-allowed"
+
+const Button: React.FC<ButtonProps> = ({
   children,
-  variant = 'primary',
-  size = 'md',
-  fullWidth = false,
+  variant = "primary",
+  size = "md",
   disabled = false,
-  loading = false,
   onClick,
-  type = 'button',
-  className = '',
+  className = "",
+  type = "button",
+  asChild = false,
+  ...props
 }) => {
-  const baseClasses = 'font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-  
-  const variantClasses = {
-    primary: 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500',
-    secondary: 'bg-secondary-100 hover:bg-secondary-200 text-secondary-700 focus:ring-secondary-500',
-    danger: 'bg-danger-600 hover:bg-danger-700 text-white focus:ring-danger-500',
-    outline: 'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500',
-  };
-  
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-  };
-  
-  const widthClass = fullWidth ? 'w-full' : '';
-  
-  const classes = [
-    baseClasses,
-    variantClasses[variant],
-    sizeClasses[size],
-    widthClass,
-    className,
-  ].filter(Boolean).join(' ');
-  
+  const buttonClasses = cn(
+    BASE_STYLES,
+    BUTTON_VARIANTS[variant],
+    BUTTON_SIZES[size],
+    className
+  )
+
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<any>, {
+      className: buttonClasses,
+      disabled,
+      onClick,
+      ...props,
+    })
+  }
+
   return (
     <button
       type={type}
-      className={classes}
+      className={buttonClasses}
+      disabled={disabled}
       onClick={onClick}
-      disabled={disabled || loading}
+      {...props}
     >
-      {loading ? (
-        <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-          Carregando...
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </button>
-  );
-};
+  )
+}
+
+export default Button
