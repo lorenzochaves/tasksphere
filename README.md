@@ -1,46 +1,140 @@
-# Getting Started with Create React App
+# TaskSphere - Sistema de Gerenciamento de Projetos
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Um sistema moderno e intuitivo para gerenciar projetos e tarefas, desenvolvido com React e TypeScript.
 
-## Available Scripts
+## 🌐 Deploy
 
-In the project directory, you can run:
+🔗 **[Acesse a aplicação aqui](https://tasksphere-smoky.vercel.app/dashboard)**
 
-### `npm start`
+## Sobre o Projeto
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Com uma interface limpa inspirada no GitHub/Kanban, me desafiei a criar um sistema robusto e completo, usufruindo do poder do React. Esse projeto foi puramente focado em mostrar habilidades frontend com React, com utilização de contextos avançados e design atômico para reutilização de componentes personalizados. Não há backend real porque não é o foco do projeto, mas TaskShere te permite explorar todas as funcionalidades da aplicação com o uso de localStorage, simulando um backend e banco de dados real.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Principais Funcionalidades
 
-### `npm test`
+- **Dashboard Completo**: Visão geral de todos os projetos com métricas em tempo real
+- **Gerenciamento de Projetos**: Criar, editar e organizar projetos com facilidade
+- **Sistema Kanban**: Quadro visual para acompanhar o progresso das tarefas
+- **Colaboração**: Adicionar e gerenciar colaboradores nos projetos
+- **Estatísticas**: Acompanhar progresso, tarefas concluídas e produtividade
+- **Interface Responsiva**: Funciona perfeitamente em desktop e mobile
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Tecnologias Utilizadas
 
-### `npm run build`
+- **Frontend**: React + TypeScript
+- **Estilização**: Tailwind CSS
+- **Roteamento**: React Router DOM
+- **Drag & Drop**: @dnd-kit e @hello-pangea/dnd
+- **Ícones**: Lucide React
+- **Persistência**: Local Storage (para demonstração)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Como Executar Localmente
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Pré-requisitos
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Node.js (versão 16 ou superior)
+- pnpm ou qualquer gerenciador de pacotes...
 
-### `npm run eject`
+### Instalação
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. Clone o repositório:
+```bash
+git clone https://github.com/lorenzochaves/tasksphere.git
+cd tasksphere
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Instale as dependências:
+```bash
+pnpm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+3. Execute o projeto:
+```bash
+pnpm start
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+4. Acesse `http://localhost:3000` no seu navegador
 
-## Learn More
+## Estrutura do Projeto
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+src/
+├── components/          # Componentes organizados por Atomic Design
+│   ├── atoms/          # Componentes básicos (Button, Typography, etc)
+│   ├── molecules/      # Combinações de atoms (TaskCard, etc)
+│   ├── organisms/      # Componentes complexos (KanbanBoard, Sidebar)
+│   ├── templates/      # Layout templates
+│   └── pages/          # Páginas da aplicação
+├── contexts/           # Contextos React (Auth, Toast, Modal)
+├── services/           # Serviços e APIs
+├── types/              # Definições TypeScript
+├── lib/                # Utilitários e helpers
+└── assets/             # Recursos estáticos
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Funcionalidades Detalhadas
+
+### Dashboard
+- Métricas gerais de todos os projetos
+- Gráficos de progresso e produtividade
+- Acesso rápido aos projetos recentes
+- Estatísticas de tarefas por status
+
+### Gerenciamento de Projetos
+- Criação de projetos com nome, descrição e prazos
+- Edição completa de informações do projeto
+- Sistema de colaboradores com diferentes permissões
+- Exclusão segura com confirmação
+
+### Sistema Kanban
+- Três colunas: A Fazer, Em Progresso, Concluído
+- Drag & drop para mover tarefas entre colunas
+- Criação rápida de tarefas
+- Detalhes completos de cada tarefa
+- Prazos e prioridades
+
+### Colaboração
+- Adicionar colaboradores por email
+- Diferentes níveis de permissão
+- Visualização de todos os membros do projeto
+- Histórico de atividades (planejado)
+
+## Interface e UX
+
+O design foi pensado para ser:
+- **Limpo e moderno**: Friendly dark theme.
+- **Intuitivo**: Fluxos de trabalho naturais
+- **Responsivo**: Funciona bem em qualquer dispositivo
+- **Acessível**: Componentes com boa acessibilidade
+- **Performático**: Otimizações para carregamento rápido
+
+### Tema Visual
+- Paleta de cores escura para personalização de colunas
+- Gradientes sutis azul-verde para elementos importantes, identidade da nossa pagina
+- Typography consistente e legível
+- Espaçamentos harmoniosos
+
+## Decisões Técnicas
+
+### Por que React + TypeScript?
+- Type safety para reduzir bugs
+- Melhor experiência de desenvolvimento
+- Facilita manutenção e escalabilidade
+
+### Por que Tailwind CSS?
+- Desenvolvimento mais rápido
+- Consistência visual
+- Bundle otimizado
+- Responsividade facilitada
+
+### Por que Atomic Design?
+- Componentes reutilizáveis
+- Escalabilidade da aplicação
+- Manutenção simplificada
+- Testes mais focados
+
+### Por que Local Storage?
+- Demonstração sem necessidade de backend
+- Funciona offline
+- Simplicidade para prototipação
+- Fácil migração para API real
