@@ -21,7 +21,9 @@ import {
   AlertCircle,
   CheckCircle,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  ChevronDown,
+  Info
 } from "lucide-react"
 
 const ProjectDetailsPage: React.FC = () => {
@@ -35,7 +37,8 @@ const ProjectDetailsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isProjectInfoOpen, setProjectInfoOpen] = useState(false)
   const [isCollaboratorManagerOpen, setCollaboratorManagerOpen] = useState(false)
-  const [isCollaboratorListOpen, setCollaboratorListOpen] = useState(false) 
+  const [isCollaboratorListOpen, setCollaboratorListOpen] = useState(false)
+  const [statsExpanded, setStatsExpanded] = useState(false) // ✅ Para mobile
 
   const fetchProjectAndTasks = async () => {
     try {
@@ -66,9 +69,7 @@ const ProjectDetailsPage: React.FC = () => {
   // ✅ FUNÇÃO OTIMIZADA - Atualiza apenas o estado local
   const handleTaskUpdate = async (taskId: string, updates: Partial<Task>) => {
     try {
-      // Atualiza no localStorage
       await persistentApi.updateTask(taskId, updates)
-      
       setTasks(prevTasks => 
         prevTasks.map(task => 
           task.id === taskId 
@@ -89,7 +90,6 @@ const ProjectDetailsPage: React.FC = () => {
     }
   }
 
-  // Para quando uma nova tarefa é criada
   const handleTaskCreate = async (newTask: Task) => {
     setTasks(prevTasks => [...prevTasks, newTask])
   }
@@ -129,6 +129,7 @@ const ProjectDetailsPage: React.FC = () => {
     }
   }
 
+  // Calculate project stats
   const projectStats = React.useMemo(() => {
     const totalTasks = tasks.length
     const completedTasks = tasks.filter(task => task.status === "done").length
@@ -149,9 +150,9 @@ const ProjectDetailsPage: React.FC = () => {
       overdue: overdueTasks,
       progress
     }
-  }, [tasks]) 
+  }, [tasks])
 
-  // Calculate project status - ✅ Usando useMemo
+  // Calculate project status
   const projectStatus = React.useMemo(() => {
     if (!project?.end_date) return { status: "active", color: "text-[#58a6ff]", label: "🚀 Em Andamento" }
     
@@ -173,28 +174,24 @@ const ProjectDetailsPage: React.FC = () => {
   if (isLoading) {
     return (
       <DashboardTemplate>
-        <div className="space-y-6 animate-pulse">
-          {/* Header skeleton */}
-          <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="space-y-2 flex-1">
-                <div className="h-8 w-64 bg-[#30363d] rounded"></div>
-                <div className="h-4 w-96 bg-[#30363d] rounded"></div>
-              </div>
-              <div className="h-10 w-10 bg-[#30363d] rounded-lg"></div>
+        <div className="space-y-4 sm:space-y-6 animate-pulse">
+          {/* Mobile-friendly skeleton */}
+          <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-6">
+            <div className="space-y-3">
+              <div className="h-6 sm:h-8 w-3/4 bg-[#30363d] rounded"></div>
+              <div className="h-4 w-full bg-[#30363d] rounded"></div>
+              <div className="h-4 w-2/3 bg-[#30363d] rounded"></div>
             </div>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-16 bg-[#0d1117] border border-[#30363d] rounded-lg"></div>
+                <div key={i} className="h-16 sm:h-20 bg-[#0d1117] border border-[#30363d] rounded-lg"></div>
               ))}
             </div>
           </div>
           
           {/* Kanban skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-96 bg-[#161b22] border border-[#30363d] rounded-lg"></div>
-            ))}
+          <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
+            <div className="h-64 bg-[#0d1117] rounded-lg"></div>
           </div>
         </div>
       </DashboardTemplate>
@@ -204,14 +201,14 @@ const ProjectDetailsPage: React.FC = () => {
   if (!project || !user) {
     return (
       <DashboardTemplate>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <AlertCircle className="w-16 h-16 text-[#f85149] mx-auto mb-4" />
-            <Typography variant="h2" className="mb-2">Projeto não encontrado</Typography>
-            <Typography variant="body" className="text-[#8b949e] mb-4">
+        <div className="flex items-center justify-center min-h-[400px] p-4">
+          <div className="text-center max-w-md">
+            <AlertCircle className="w-12 h-12 sm:w-16 sm:h-16 text-[#f85149] mx-auto mb-4" />
+            <Typography variant="h2" className="mb-2 text-lg sm:text-xl">Projeto não encontrado</Typography>
+            <Typography variant="body" className="text-[#8b949e] mb-4 text-sm sm:text-base">
               O projeto que você está procurando não existe ou foi removido.
             </Typography>
-            <Button variant="primary" onClick={() => navigate("/projects")}>
+            <Button variant="primary" onClick={() => navigate("/projects")} className="w-full sm:w-auto">
               Voltar aos Projetos
             </Button>
           </div>
@@ -222,188 +219,213 @@ const ProjectDetailsPage: React.FC = () => {
 
   return (
     <DashboardTemplate>
-      <div className="space-y-6">
-        {/* Enhanced Header */}
-        <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-start gap-4 flex-1 min-w-0">
-              <div className="p-3 bg-[#3fb950] rounded-lg flex-shrink-0">
-                <FolderKanban className="w-6 h-6 text-white" />
+      <div className="space-y-4 sm:space-y-6">
+        {/* ✅ Header responsivo melhorado */}
+        <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-6">
+          {/* ✅ Mobile-first layout */}
+          <div className="space-y-4">
+            {/* Cabeçalho principal */}
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="p-2 sm:p-3 bg-[#3fb950] rounded-lg flex-shrink-0">
+                <FolderKanban className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <Typography variant="h1" className="text-2xl font-bold text-[#f0f6fc] truncate">
-                    {project.name}
-                  </Typography>
-                  <span className={`text-sm font-medium ${projectStatus.color}`}>
-                    {projectStatus.label}
-                  </span>
-                </div>
-                <Typography variant="body" className="text-[#8b949e] mb-3">
-                  {project.description || "Sem descrição"}
-                </Typography>
-                
-                {/* Project Meta Info */}
-                <div className="flex flex-wrap items-center gap-4 text-sm text-[#8b949e]">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>Início: {new Date(project.start_date).toLocaleDateString('pt-BR')}</span>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <Typography variant="h1" className="text-lg sm:text-2xl font-bold text-[#f0f6fc] truncate mb-1">
+                      {project.name}
+                    </Typography>
+                    <span className={`inline-block text-xs sm:text-sm font-medium px-2 py-1 rounded-full bg-opacity-20 ${projectStatus.color}`}>
+                      {projectStatus.label}
+                    </span>
                   </div>
-                  {project.end_date && (
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      <span>Fim: {new Date(project.end_date).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                  )}
                   
-                  {/* ✅ COLABORADORES COM PREVIEW E CLIQUE */}
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <div className="flex items-center gap-2">
-                      {/* Preview dos primeiros 3 colaboradores */}
-                      <div className="flex -space-x-2">
-                        {project.collaborators.slice(0, 3).map((collaborator) => (
-                          <div
-                            key={collaborator.id}
-                            className="w-6 h-6 rounded-full border-2 border-[#161b22] hover:z-10 hover:scale-110 transition-transform bg-[#3fb950] flex items-center justify-center text-white text-xs font-medium"
-                            title={collaborator.name}
-                          >
-                            {collaborator.avatar ? (
-                              <img
-                                src={collaborator.avatar}
-                                alt={collaborator.name}
-                                className="w-full h-full rounded-full"
-                              />
-                            ) : (
-                              collaborator.name.charAt(0).toUpperCase()
-                            )}
-                          </div>
-                        ))}
-                        {project.collaborators.length > 3 && (
-                          <div className="w-6 h-6 rounded-full bg-[#30363d] border-2 border-[#161b22] flex items-center justify-center text-xs text-[#8b949e]">
-                            +{project.collaborators.length - 3}
-                          </div>
+                  {/* ✅ Botão configurações otimizado para mobile */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setProjectInfoOpen(true)}
+                    className="flex items-center gap-1 text-[#8b949e] border-[#30363d] hover:text-[#58a6ff] hover:border-[#58a6ff] text-xs sm:text-sm px-2 sm:px-3"
+                  >
+                    <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Configurações</span>
+                  </Button>
+                </div>
+                
+                {/* ✅ Descrição melhorada */}
+                {project.description && (
+                  <Typography variant="body" className="text-[#8b949e] mt-2 text-sm sm:text-base line-clamp-2">
+                    {project.description}
+                  </Typography>
+                )}
+              </div>
+            </div>
+
+            {/* ✅ Meta info em stack vertical no mobile */}
+            <div className="space-y-2 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-4 text-sm text-[#8b949e] border-t border-[#30363d] pt-3 sm:border-t-0 sm:pt-0">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 flex-shrink-0" />
+                <span className="text-xs sm:text-sm">Início: {new Date(project.start_date).toLocaleDateString('pt-BR')}</span>
+              </div>
+              
+              {project.end_date && (
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm">Fim: {new Date(project.end_date).toLocaleDateString('pt-BR')}</span>
+                </div>
+              )}
+              
+              {/* ✅ Colaboradores otimizado para mobile */}
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 flex-shrink-0" />
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {/* Preview compacto */}
+                  <div className="flex -space-x-1">
+                    {project.collaborators.slice(0, 2).map((collaborator) => (
+                      <div
+                        key={collaborator.id}
+                        className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-[#161b22] bg-[#3fb950] flex items-center justify-center text-white text-xs font-medium flex-shrink-0"
+                        title={collaborator.name}
+                      >
+                        {collaborator.avatar ? (
+                          <img
+                            src={collaborator.avatar}
+                            alt={collaborator.name}
+                            className="w-full h-full rounded-full"
+                          />
+                        ) : (
+                          collaborator.name.charAt(0).toUpperCase()
                         )}
                       </div>
-                      
-                      {/* Contador clicável */}
-                      <button
-                        onClick={() => setCollaboratorListOpen(true)}
-                        className="hover:text-[#58a6ff] hover:underline transition-colors cursor-pointer"
-                      >
-                        {project.collaborators.length} colaborador{project.collaborators.length !== 1 ? 'es' : ''}
-                      </button>
-                    </div>
+                    ))}
+                    {project.collaborators.length > 2 && (
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#30363d] border-2 border-[#161b22] flex items-center justify-center text-xs text-[#8b949e] flex-shrink-0">
+                        +{project.collaborators.length - 2}
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Texto clicável */}
+                  <button
+                    onClick={() => setCollaboratorListOpen(true)}
+                    className="hover:text-[#58a6ff] hover:underline transition-colors text-xs sm:text-sm truncate"
+                  >
+                    {project.collaborators.length} colaborador{project.collaborators.length !== 1 ? 'es' : ''}
+                  </button>
                 </div>
               </div>
             </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setProjectInfoOpen(true)}
-              className="flex items-center gap-2 text-[#8b949e] border-[#30363d] hover:text-[#58a6ff] hover:border-[#58a6ff]"
-            >
-              <Settings className="w-4 h-4" />
-              Configurações
-            </Button>
           </div>
 
-          {/* Project Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <BarChart3 className="w-4 h-4 text-[#8b949e]" />
-                <Typography variant="small" className="text-[#8b949e] font-medium">
-                  Total
-                </Typography>
+          {/* ✅ Stats expansíveis no mobile */}
+          <div className="mt-4 sm:mt-6">
+            {/* Botão para expandir stats no mobile */}
+            <button
+              onClick={() => setStatsExpanded(!statsExpanded)}
+              className="w-full sm:hidden flex items-center justify-between p-3 bg-[#0d1117] border border-[#30363d] rounded-lg text-[#8b949e] hover:text-[#f0f6fc] transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                <span className="text-sm font-medium">Estatísticas do Projeto</span>
               </div>
-              <Typography variant="h5" className="text-[#f0f6fc]">
-                {projectStats.total}
-              </Typography>
-              <Typography variant="muted" className="text-[#8b949e]">
-                tarefas
-              </Typography>
-            </div>
+              <ChevronDown className={`w-4 h-4 transition-transform ${statsExpanded ? 'rotate-180' : ''}`} />
+            </button>
 
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="w-4 h-4 text-[#3fb950]" />
-                <Typography variant="small" className="text-[#8b949e] font-medium">
-                  Concluídas
+            {/* Stats grid - sempre visível no desktop, expansível no mobile */}
+            <div className={`grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 ${statsExpanded ? 'block' : 'hidden sm:grid'} ${statsExpanded ? 'mt-3' : ''}`}>
+              <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-3 sm:p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 text-[#8b949e]" />
+                  <Typography variant="small" className="text-[#8b949e] font-medium text-xs sm:text-sm">
+                    Total
+                  </Typography>
+                </div>
+                <Typography variant="h5" className="text-[#f0f6fc] text-lg sm:text-xl">
+                  {projectStats.total}
+                </Typography>
+                <Typography variant="muted" className="text-[#8b949e] text-xs sm:text-sm">
+                  tarefas
                 </Typography>
               </div>
-              <Typography variant="h5" className="text-[#f0f6fc]">
-                {projectStats.completed}
-              </Typography>
-              <Typography variant="muted" className="text-[#8b949e]">
-                de {projectStats.total}
-              </Typography>
-            </div>
 
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-4 h-4 text-[#58a6ff]" />
-                <Typography variant="small" className="text-[#8b949e] font-medium">
-                  Progresso
+              <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-3 sm:p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-[#3fb950]" />
+                  <Typography variant="small" className="text-[#8b949e] font-medium text-xs sm:text-sm">
+                    Concluídas
+                  </Typography>
+                </div>
+                <Typography variant="h5" className="text-[#f0f6fc] text-lg sm:text-xl">
+                  {projectStats.completed}
+                </Typography>
+                <Typography variant="muted" className="text-[#8b949e] text-xs sm:text-sm">
+                  de {projectStats.total}
                 </Typography>
               </div>
-              <Typography variant="h5" className="text-[#f0f6fc]">
-                {projectStats.progress}%
-              </Typography>
-              <div className="w-full bg-[#21262d] rounded-full h-1.5 mt-2">
-                <div 
-                  className="bg-[#3fb950] h-1.5 rounded-full transition-all duration-300" 
-                  style={{ width: `${projectStats.progress}%` }}
-                />
-              </div>
-            </div>
 
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-4 h-4 text-[#f85149]" />
-                <Typography variant="small" className="text-[#8b949e] font-medium">
-                  Atrasadas
+              <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-3 sm:p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-[#58a6ff]" />
+                  <Typography variant="small" className="text-[#8b949e] font-medium text-xs sm:text-sm">
+                    Progresso
+                  </Typography>
+                </div>
+                <Typography variant="h5" className="text-[#f0f6fc] text-lg sm:text-xl">
+                  {projectStats.progress}%
+                </Typography>
+                <div className="w-full bg-[#21262d] rounded-full h-1.5 mt-2">
+                  <div 
+                    className="bg-[#3fb950] h-1.5 rounded-full transition-all duration-300" 
+                    style={{ width: `${projectStats.progress}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-3 sm:p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-[#f85149]" />
+                  <Typography variant="small" className="text-[#8b949e] font-medium text-xs sm:text-sm">
+                    Atrasadas
+                  </Typography>
+                </div>
+                <Typography variant="h5" className="text-[#f0f6fc] text-lg sm:text-xl">
+                  {projectStats.overdue}
+                </Typography>
+                <Typography variant="muted" className="text-[#8b949e] text-xs sm:text-sm">
+                  tarefas
                 </Typography>
               </div>
-              <Typography variant="h5" className="text-[#f0f6fc]">
-                {projectStats.overdue}
-              </Typography>
-              <Typography variant="muted" className="text-[#8b949e]">
-                tarefas
-              </Typography>
             </div>
           </div>
         </div>
 
-        {/* Kanban Board */}
+        {/* ✅ Kanban Board com header melhorado */}
         <div className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
-          <div className="p-4 border-b border-[#30363d]">
-            <Typography variant="h3" className="text-[#f0f6fc] flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
+          <div className="p-3 sm:p-4 border-b border-[#30363d]">
+            <Typography variant="h3" className="text-[#f0f6fc] flex items-center gap-2 text-base sm:text-lg">
+              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
               Quadro Kanban
             </Typography>
-            <Typography variant="small" className="text-[#8b949e] mt-1">
+            <Typography variant="small" className="text-[#8b949e] mt-1 text-xs sm:text-sm">
               Gerencie suas tarefas arrastando entre as colunas
             </Typography>
           </div>
           
-          <div className="p-4">
+          <div className="p-2 sm:p-4">
             <KanbanBoard
               projectId={project.id}
               tasks={tasks}
               isOwner={project.creator_id === user.id}
               isCollaborator={project.collaborators.some(c => c.id === user.id)}
-              onTaskUpdate={handleTaskUpdate} // ✅ Função otimizada
-              onTaskCreate={handleTaskCreate} // ✅ Função otimizada  
-              onTaskDelete={handleTaskDelete} // ✅ Função otimizada
-              onRefreshTasks={fetchProjectAndTasks} // ✅ Apenas para casos excepcionais
+              onTaskUpdate={handleTaskUpdate}
+              onTaskCreate={handleTaskCreate}
+              onTaskDelete={handleTaskDelete}
+              onRefreshTasks={fetchProjectAndTasks}
             />
           </div>
         </div>
 
-        {/* ✅ MODAL DE COLABORADORES */}
+        {/* Modals */}
         <CollaboratorListModal
           isOpen={isCollaboratorListOpen}
           onClose={() => setCollaboratorListOpen(false)}
@@ -412,7 +434,6 @@ const ProjectDetailsPage: React.FC = () => {
           projectOwnerId={project.creator_id}
         />
 
-        {/* Modals existentes */}
         <ProjectInfoModal
           isOpen={isProjectInfoOpen}
           onClose={() => setProjectInfoOpen(false)}
@@ -437,7 +458,6 @@ const ProjectDetailsPage: React.FC = () => {
                   collaborators: updatedCollaborators
                 })
                 setProject(updatedProject)
-          
                 toast({
                   title: "Sucesso",
                   description: "Colaboradores atualizados com sucesso.",
@@ -456,7 +476,6 @@ const ProjectDetailsPage: React.FC = () => {
 
         <EditProjectModal onProjectUpdate={async (updatedProject) => {
           setProject(updatedProject)
-
         }} />
       </div>
     </DashboardTemplate>
