@@ -1,104 +1,81 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { AuthUser, LoginCredentials } from '../types/types';
+"use client"
+
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import type { User, LoginCredentials, RegisterData } from "../types"
+import { persistentApi } from "../services/localStorageApi"
 
 interface AuthContextType {
-  user: AuthUser | null;
-  login: (credentials: LoginCredentials) => Promise<boolean>;
-  logout: () => void;
-  isLoading: boolean;
-  isAuthenticated: boolean;
+  user: User | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  login: (credentials: LoginCredentials) => Promise<User>
+  register: (data: RegisterData) => Promise<User>
+  logout: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Verifica se há usuário logado no localStorage ao inicializar
   useEffect(() => {
-    const storedUser = localStorage.getItem('tasksphere_user');
+    const storedUser = persistentApi.getCurrentUser()
     if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Erro ao recuperar usuário do localStorage:', error);
-        localStorage.removeItem('tasksphere_user');
-      }
+      setUser(storedUser)
     }
-    setIsLoading(false);
-  }, []);
+    setIsLoading(false)
+  }, [])
 
-  const login = async (credentials: LoginCredentials): Promise<boolean> => {
-    setIsLoading(true);
-    
+  const login = async (credentials: LoginCredentials) => {
     try {
-      // Simula chamada para API local (JSON Server)
-      const response = await fetch('http://localhost:3001/users');
-      const users = await response.json();
-      
-      // Busca usuário com email e senha correspondentes
-      const foundUser = users.find(
-        (user: any) => 
-          user.email === credentials.email && 
-          user.password === credentials.password
-      );
-
-      if (foundUser) {
-        // Remove a senha do objeto do usuário para segurança
-        const authUser: AuthUser = {
-          id: foundUser.id,
-          name: foundUser.name,
-          email: foundUser.email,
-        };
-
-        setUser(authUser);
-        localStorage.setItem('tasksphere_user', JSON.stringify(authUser));
-        setIsLoading(false);
-        return true;
-      } else {
-        setIsLoading(false);
-        return false;
-      }
+      const user = await persistentApi.login(credentials)
+      setUser(user)
+      return user
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      setIsLoading(false);
-      return false;
+      throw error
     }
-  };
+  }
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('tasksphere_user');
-  };
+  const register = async (data: RegisterData) => {
+    try {
+      const user = await persistentApi.register(data)
+      setUser(user)
+      return user
+    } catch (error) {
+      throw error
+    }
+  }
 
-  const isAuthenticated = !!user;
-
-  const value: AuthContextType = {
-    user,
-    login,
-    logout,
-    isLoading,
-    isAuthenticated,
-  };
+  const logout = async () => {
+    try {
+      await persistentApi.logout()
+      setUser(null)
+    } catch (error) {
+      console.error("Error during logout:", error)
+    }
+  }
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
-// Hook customizado para usar o AuthContext
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
+export function useAuth() {
+  const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider")
   }
-  return context;
-};
+  return context
+}
