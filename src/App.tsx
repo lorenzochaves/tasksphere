@@ -1,43 +1,98 @@
-import React from 'react';
-import './App.css';
-import { AuthProvider } from './contexts/AuthContext';
-import { Card, Button, Heading, Text } from './components/atoms';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
+import { AuthProvider } from "./contexts/AuthContext"
+import { ToastProvider } from "./contexts/ToastContext"
+import { ModalProvider } from "./contexts/ModalContext"
+import ErrorBoundary from "./components/molecules/ErrorBoundary"
+import ProtectedRoute from "./components/molecules/ProtectedRoute"
+import { persistentApi } from "./services/localStorageApi"
+import StatsPage from "./components/pages/StatsPage"
+
+// Pages
+import LoginPage from "./components/pages/LoginPage"
+import RegisterPage from "./components/pages/RegisterPage"
+import DashboardPage from "./components/pages/DashboardPage"
+import MyProjectsPage from "./components/pages/MyProjectsPage"
+import ProjectDetailsPage from "./components/pages/ProjectDetailsPage"
+import AllTasksPage from "./components/pages/AllTasksPage"
+import SettingsPage from "./components/pages/SettingsPage"
+import AccessDeniedPage from "./components/pages/AccessDeniedPage"
+
+// Initialize persistent storage
+try {
+  persistentApi.initialize()
+  console.log("App initialized successfully")
+} catch (error) {
+  console.error("Error initializing app:", error)
+}
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center">
-            <Heading level={1} className="text-primary-600 mb-4">
-              TaskSphere
-            </Heading>
-            <Text variant="caption" color="muted" className="mb-8">
-              Gestão colaborativa de projetos em desenvolvimento...
-            </Text>
-            
-            <Card className="max-w-md mx-auto">
-              <Heading level={2} className="mb-4">
-                🚀 Projeto em Construção
-              </Heading>
-              <Text color="muted" className="mb-6">
-                AuthContext configurado! Próximo: React Router e Login
-              </Text>
-              
-              <div className="space-y-3">
-                <Button fullWidth>
-                  Entrar no Sistema
-                </Button>
-                <Button variant="secondary" fullWidth>
-                  Saber Mais
-                </Button>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </AuthProvider>
-  );
+    <ErrorBoundary>
+      <AuthProvider>
+        <ToastProvider>
+          <ModalProvider>
+            <Router>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/access-denied" element={<AccessDeniedPage />} />
+
+                {/* Protected routes */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/projects"
+                  element={
+                    <ProtectedRoute>
+                      <MyProjectsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/projects/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ProjectDetailsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/tasks"
+                  element={
+                    <ProtectedRoute>
+                      <AllTasksPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/stats" element={<StatsPage />} />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <SettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Redirect root to dashboard */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+                {/* Catch all route */}
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </Router>
+          </ModalProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </ErrorBoundary>
+  )
 }
 
-export default App;
+export default App

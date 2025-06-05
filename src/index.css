@@ -2,21 +2,245 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom components */
+@layer base {
+  :root {
+    --background: 215 21% 11%;
+    --foreground: 210 10% 83%;
+    --border: 215 14% 21%;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  /* Improved scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-600;
+  }
+}
+
 @layer components {
+  /* Custom button styles */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors 
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+    disabled:opacity-50 disabled:pointer-events-none;
+  }
+
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply bg-[#238636] text-white hover:bg-[#2ea043];
   }
-  
+
   .btn-secondary {
-    @apply bg-secondary-100 hover:bg-secondary-200 text-secondary-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
+    @apply bg-[#1f6feb] text-white hover:bg-[#388bfd];
   }
-  
-  .input-field {
-    @apply w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200;
+
+  .btn-destructive {
+    @apply bg-[#da3633] text-white hover:bg-[#f85149];
   }
-  
+
+  .btn-outline {
+    @apply border border-[#30363d] bg-transparent text-[#c9d1d9] hover:bg-[#30363d];
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-[#c9d1d9] hover:bg-[#30363d];
+  }
+
+  .btn-sm {
+    @apply h-8 px-3 text-xs;
+  }
+
+  .btn-md {
+    @apply h-9 px-4;
+  }
+
+  .btn-lg {
+    @apply h-10 px-5;
+  }
+
+  .btn-icon {
+    @apply h-9 w-9 p-2;
+  }
+
+  /* Custom card styles */
   .card {
-    @apply bg-white rounded-xl shadow-soft border border-secondary-100 p-6;
+    @apply bg-[#161b22] border border-[#30363d] rounded-md overflow-hidden;
+  }
+
+  /* Custom input styles */
+  .input {
+    @apply h-9 w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-md
+    text-sm text-[#c9d1d9] placeholder:text-[#8b949e] 
+    focus:outline-none focus:ring-1 focus:ring-[#1f6feb] focus:border-[#1f6feb]
+    disabled:opacity-50;
+  }
+
+  /* Kanban specific styles */
+  .kanban-column {
+    @apply flex flex-col h-[calc(100vh-220px)] min-h-[300px] p-3 rounded-md border border-[#30363d] bg-[#161b22];
+  }
+
+  .kanban-header {
+    @apply flex items-center justify-between mb-3 px-1;
+  }
+
+  .kanban-title {
+    @apply flex items-center space-x-2 text-sm font-medium text-[#c9d1d9];
+  }
+
+  .kanban-cards {
+    @apply space-y-2 overflow-y-auto flex-grow pr-1;
+  }
+  
+  /* Kanban card styles */
+  .kanban-card {
+    @apply bg-[#0d1117] border border-[#30363d] p-3 rounded-md hover:border-[#8b949e] transition-all cursor-pointer relative;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transform-origin: 50% 0;
+    will-change: transform, opacity;
+  }
+  
+  .kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .kanban-card:active {
+    transform: translateY(0);
+  }
+
+  .kanban-card[data-dragging="true"] {
+    animation: card-pulse 1s ease infinite;
+  }
+  
+  @keyframes card-pulse {
+    0% {
+      box-shadow: 0 0 0 1px rgba(31, 111, 235, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.4);
+    }
+    100% {
+      box-shadow: 0 0 0 1px rgba(31, 111, 235, 0.3);
+    }
+  }
+  
+  /* Styling for drag overlay */
+  [data-dnd-overlay] .kanban-card {
+    @apply shadow-xl bg-[#161b22] border-[#1f6feb] transform rotate-1 opacity-100 !cursor-grabbing;
+    animation: card-pulse 1.5s infinite alternate;
+  }
+  
+  /* Drag overlay styling for better visibility during dragging */
+  .drag-overlay-card {
+    @apply pointer-events-none;
+  }
+  
+  .drag-overlay-card .kanban-card {
+    @apply bg-[#0d1117] border border-[#1f6feb] shadow-lg scale-105 opacity-90 z-50 cursor-grabbing transform rotate-1;
+    box-shadow: 0 0 0 1px rgba(31, 111, 235, 0.3), 0 10px 20px rgba(0, 0, 0, 0.4);
+    animation: card-pulse 2s infinite alternate;
+  }
+  
+  @keyframes card-pulse {
+    0% {
+      box-shadow: 0 0 0 1px rgba(31, 111, 235, 0.3), 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+    100% {
+      box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.5), 0 12px 25px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  /* Custom badge styles */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  .badge-default {
+    @apply bg-[#30363d] text-[#c9d1d9];
+  }
+
+  .badge-primary {
+    @apply bg-[#238636] text-white;
+  }
+
+  .badge-secondary {
+    @apply bg-[#1f6feb] text-white;
+  }
+
+  .badge-outline {
+    @apply bg-transparent border border-[#30363d] text-[#c9d1d9];
+  }
+
+  .badge-success {
+    @apply bg-[#238636] text-white;
+  }
+
+  .badge-warning {
+    @apply bg-[#9e6a03] text-white;
+  }
+
+  .badge-error {
+    @apply bg-[#da3633] text-white;
+  }
+
+  /* Custom scrollbar for kanban columns */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-[#30363d] rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-[#8b949e];
+  }
+
+  /* Mobile optimizations for kanban board */
+  @media (max-width: 768px) {
+    /* Ensure horizontal scroll works properly on mobile */
+    .kanban-board-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Improve touch targets for mobile drag and drop */
+    .kanban-card {
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    
+    /* Better scrollbar for mobile kanban columns */
+    .kanban-column .custom-scrollbar::-webkit-scrollbar {
+      width: 2px;
+    }
+    
+    /* Improve mobile drag feedback */
+    .kanban-card:active {
+      transform: scale(1.02);
+      transition: transform 0.1s ease;
+    }
   }
 }
